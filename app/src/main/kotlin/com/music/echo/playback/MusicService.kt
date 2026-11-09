@@ -716,7 +716,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
       dataStore.data
         .map {
           val listenBrainz = it[echo.music.iad1tya.constants.ListenBrainzEnabledKey] ?: false
-          val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: false
+          val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: true
           if (dataSaver) false else listenBrainz
         }
         .distinctUntilChanged()
@@ -746,7 +746,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
                 enumVal.name == value
               }
             } ?: echo.music.iad1tya.constants.AudioQuality.OPUS
-          val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: false
+          val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: true
           if (dataSaver) echo.music.iad1tya.constants.AudioQuality.OPUS else quality
         }
         .distinctUntilChanged()
@@ -837,7 +837,7 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
               } catch (e: Exception) {
                 null
               }) ?: false
-            val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: false
+            val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: true
             if (dataSaver) false else showLyrics
           }
           .distinctUntilChanged(),
@@ -1202,10 +1202,10 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         .setLoadControl(
           DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-              360_000, // min buffer: 6 minutes (will fetch heavily ahead)
-              360_000, // max buffer: 6 minutes
-              150,     // bufferForPlaybackMs: 150ms for near-instant zero-latency startup
-              500      // bufferForPlaybackAfterRebufferMs: 500ms
+              60_000,  // min buffer: 60s (saves mobile data from downloading full songs ahead)
+              120_000, // max buffer: 2 minutes
+              100,     // bufferForPlaybackMs: 100ms for instant zero-latency startup
+              300      // bufferForPlaybackAfterRebufferMs: 300ms
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()

@@ -188,3 +188,24 @@
 
 ## API Models to protect kotlinx.serialization
 -keep class com.music.** { *; }
+
+################################################################################
+## MNC ENTERPRISE ANTI-REVERSE ENGINEERING & OBFUSCATION GUARD
+################################################################################
+# Strip Kotlin SourceFile attributes so decompiler displays no original .kt names
+-renamesourcefileattribute ""
+-keepattributes !SourceFile,!LineNumberTable
+
+# Package Flattening & Extreme Identifier Scrambling
+-repackageclasses 'a'
+-allowaccessmodification
+-overloadaggressively
+
+# Strip all debug logging from production bytecode
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+}

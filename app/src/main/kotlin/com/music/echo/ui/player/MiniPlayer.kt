@@ -194,7 +194,7 @@ fun MiniPlayer(
         MiniPlayerBackgroundStyleKey,
         defaultValue = PlayerBackgroundStyle.DEFAULT
       )
-    val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = false)
+    val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = true)
 
     val isSystemInDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
     val darkTheme by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
@@ -256,7 +256,7 @@ fun MiniPlayer(
 private fun NewMiniPlayer(progressState: ProgressState, modifier: Modifier = Modifier) {
   val playerConnection = LocalPlayerConnection.current ?: return
 
-  val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = false)
+  val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = true)
   val isSystemInDarkTheme = isSystemInDarkTheme()
   val darkTheme by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
   val useDarkTheme =
@@ -627,7 +627,7 @@ private fun NewMiniPlayerSongInfo(
 @Composable
 private fun LegacyMiniPlayer(progressState: ProgressState, modifier: Modifier = Modifier) {
   val playerConnection = LocalPlayerConnection.current ?: return
-  val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = false)
+  val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = true)
   val isSystemInDarkTheme = isSystemInDarkTheme()
   val darkTheme by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
   val useDarkTheme =

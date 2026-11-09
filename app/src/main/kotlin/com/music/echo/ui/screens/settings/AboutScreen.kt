@@ -170,22 +170,16 @@ fun AboutScreen(
           items =
             listOf(
               Material3SettingsItem(
-                icon = painterResource(R.drawable.github),
-                title = { Text("GitHub") },
-                description = { Text("harinath4496") },
-                onClick = { uriHandler.openUri("https://github.com/harinath4496") }
-              ),
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.ic_instagram_new),
-                title = { Text("Instagram") },
-                description = { Text("@harinath_4496") },
-                onClick = { uriHandler.openUri("https://www.instagram.com/harinath_4496") }
+                icon = painterResource(R.drawable.star),
+                title = { Text("Lead Developer") },
+                description = { Text("Rajesh") },
+                onClick = { }
               ),
               Material3SettingsItem(
                 icon = painterResource(R.drawable.star),
-                title = { Text("IRAH Music Repository") },
-                description = { Text("harinath4496/IrahMusic") },
-                onClick = { uriHandler.openUri("https://github.com/harinath4496/IrahMusic") }
+                title = { Text("Aura Music Project") },
+                description = { Text("Emerald Pulse Open-Source Edition") },
+                onClick = { }
               )
             )
         )
@@ -275,12 +269,10 @@ private fun AboutAppCard() {
           modifier = Modifier.fillMaxSize()
         )
       } else {
-        coil3.compose.AsyncImage(
-          model = "https://github.com/harinath4496.png",
+        Image(
+          painter = painterResource(R.drawable.star),
           contentDescription = null,
-          modifier =
-            Modifier.fillMaxSize().graphicsLayer { rotationY = 180f }, // Un-flip the backside image
-          contentScale = androidx.compose.ui.layout.ContentScale.Crop
+          modifier = Modifier.fillMaxSize().padding(16.dp)
         )
       }
     }
@@ -288,7 +280,7 @@ private fun AboutAppCard() {
     Spacer(Modifier.height(4.dp))
 
     Text(
-      text = if (rotation <= 90f) "IRAH Music" else "Crafted for Harinath by IRAH",
+      text = if (rotation <= 90f) "Aura Music" else "Crafted for Rajesh • Aura Edition",
       style = MaterialTheme.typography.titleLarge,
       fontWeight = FontWeight.Bold,
       color = MaterialTheme.colorScheme.onSurface,

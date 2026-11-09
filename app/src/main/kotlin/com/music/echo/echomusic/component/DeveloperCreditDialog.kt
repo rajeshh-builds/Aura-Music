@@ -83,7 +83,7 @@ fun DeveloperCreditDialog(
             }
 
             Text(
-              text = "IRAH Music",
+              text = "Aura Music",
               style = MaterialTheme.typography.headlineMedium,
               fontWeight = FontWeight.ExtraBold,
               color = MaterialTheme.colorScheme.onSurface,
@@ -91,7 +91,7 @@ fun DeveloperCreditDialog(
             )
 
             Text(
-              text = "Developed & Maintained by Harinath",
+              text = "Developed & Maintained by Rajesh",
               style = MaterialTheme.typography.titleMedium,
               fontWeight = FontWeight.SemiBold,
               color = MaterialTheme.colorScheme.primary,

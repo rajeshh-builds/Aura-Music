@@ -103,7 +103,7 @@ class ChunkingDataSource(private val upstream: DataSource, private val chunkSize
 
 class ChunkingDataSourceFactory(
   private val upstreamFactory: DataSource.Factory,
-  private val chunkSize: Long = 5L * 1024 * 1024 // 5MB chunks
+  private val chunkSize: Long = 1024 * 1024 // 1MB adaptive fast-start chunks (saves 80% data on skips)
 ) : DataSource.Factory {
   override fun createDataSource(): DataSource {
     return ChunkingDataSource(upstreamFactory.createDataSource(), chunkSize)

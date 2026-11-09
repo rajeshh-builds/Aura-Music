@@ -475,10 +475,10 @@ class MainActivity : ComponentActivity() {
     val navController = rememberNavController()
     
     LaunchedEffect(navController) { this@MainActivity.navController = navController }
-    val enableDynamicTheme by rememberPreference(DynamicThemeKey, defaultValue = true)
+    val enableDynamicTheme by rememberPreference(DynamicThemeKey, defaultValue = false)
     val enableHighRefreshRate by rememberPreference(EnableHighRefreshRateKey, defaultValue = true)
     val context = LocalContext.current
-    var showDeveloperCreditDialog by remember { androidx.compose.runtime.mutableStateOf(true) }
+    var showDeveloperCreditDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
     var showUpdateDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
     var availableUpdateVersion by remember { androidx.compose.runtime.mutableStateOf("") }
     var availableUpdateChangelog by remember {
@@ -571,7 +571,7 @@ class MainActivity : ComponentActivity() {
 
     LaunchedEffect(useDarkTheme) { setSystemBarAppearance(useDarkTheme) }
 
-    val pureBlackEnabled by rememberPreference(PureBlackKey, defaultValue = false)
+    val pureBlackEnabled by rememberPreference(PureBlackKey, defaultValue = true)
     val pureBlack = remember(pureBlackEnabled, useDarkTheme) { pureBlackEnabled && useDarkTheme }
 
     val (selectedThemeColorInt) =
@@ -988,7 +988,7 @@ class MainActivity : ComponentActivity() {
 
         val currentTitle =
           when (navBackStackEntry?.destination?.route) {
-            Screens.Home.route -> "IRAH Music"
+            Screens.Home.route -> "Aura Music"
             Screens.Search.route -> stringResource(R.string.search)
             Screens.Library.route -> stringResource(R.string.filter_library)
             Screens.ListenTogether.route -> stringResource(R.string.together)
@@ -1076,7 +1076,7 @@ class MainActivity : ComponentActivity() {
                       if (navBackStackEntry?.destination?.route == Screens.Home.route) {
                         Column {
                           Text(
-                            text = "IRAH Music",
+                            text = "Aura Music",
                             style =
                               MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
@@ -1084,10 +1084,10 @@ class MainActivity : ComponentActivity() {
                               ),
                           )
                           Text(
-                            text = "dev by Hari<3",
+                            text = "Developed by Rajesh",
                             style =
                               MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Medium,
+                                fontWeight = FontWeight.SemiBold,
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.primary
                               ),

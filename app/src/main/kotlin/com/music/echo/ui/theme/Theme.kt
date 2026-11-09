@@ -28,7 +28,13 @@ import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicColorScheme
 import com.materialkolor.score.Score
 
-val DefaultThemeColor = Color(0xFFED5564)
+// Emerald Pulse Elite Spotify Palette
+val EmeraldPulseGreen = Color(0xFF1DB954)
+val EmeraldPulseNeon = Color(0xFF10E77E)
+val EmeraldPulseDarkBg = Color(0xFF060907)
+val EmeraldPulseSurface = Color(0xFF0F1713)
+
+val DefaultThemeColor = EmeraldPulseGreen
 
 @Composable
 fun echomusicTheme(
@@ -52,29 +58,44 @@ fun echomusicTheme(
   }
 
 
-  val useSystemDynamicColor =
-    (themeColor == DefaultThemeColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+  // Default to Emerald Pulse brand palette for signature luxury aesthetic
+  val useSystemDynamicColor = false
 
   val baseColorScheme =
     if (useSystemDynamicColor) {
-
       if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     } else {
-
       rememberDynamicColorScheme(
         seedColor = themeColor,
         isDark = darkTheme,
         specVersion = ColorSpec.SpecVersion.SPEC_2025,
-        style = PaletteStyle.TonalSpot
+        style = PaletteStyle.Vibrant
       )
     }
 
   val colorScheme =
     remember(baseColorScheme, pureBlack, darkTheme) {
-      if (darkTheme && pureBlack) {
-        baseColorScheme.pureBlack(true)
+      if (darkTheme) {
+        val base = if (pureBlack) baseColorScheme.pureBlack(true) else baseColorScheme
+        base.copy(
+          primary = EmeraldPulseGreen,
+          onPrimary = Color.Black,
+          primaryContainer = Color(0xFF0D2818),
+          onPrimaryContainer = EmeraldPulseNeon,
+          secondary = EmeraldPulseNeon,
+          onSecondary = Color.Black,
+          secondaryContainer = Color(0xFF143022),
+          onSecondaryContainer = EmeraldPulseNeon,
+          surface = if (pureBlack) Color.Black else Color(0xFF060907),
+          surfaceContainer = if (pureBlack) Color(0xFF0A0F0D) else Color(0xFF0F1713),
+          surfaceContainerHigh = Color(0xFF14201A),
+          surfaceContainerHighest = Color(0xFF1C2C24)
+        )
       } else {
-        baseColorScheme
+        baseColorScheme.copy(
+          primary = EmeraldPulseGreen,
+          onPrimary = Color.White
+        )
       }
     }
 

@@ -155,18 +155,22 @@ android {
 
   buildTypes {
     release {
-      isMinifyEnabled = false
-      isShrinkResources = false
-      isCrunchPngs = false
+      isMinifyEnabled = true
+      isShrinkResources = true
+      isCrunchPngs = true
       isDebuggable = false
       signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      buildConfigField("String", "ARCHITECTURE", "\"release\"")
+      buildConfigField("String", "ARCHITECTURE", "\"arm64-v8a\"")
     }
     debug {
-      isDebuggable = true
+      isMinifyEnabled = true
+      isShrinkResources = true
+      isCrunchPngs = true
+      isDebuggable = false
       signingConfig = signingConfigs.getByName("debug")
-      buildConfigField("String", "ARCHITECTURE", "\"debug\"")
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      buildConfigField("String", "ARCHITECTURE", "\"arm64-v8a\"")
     }
   }
 
@@ -217,6 +221,10 @@ android {
       excludes += "META-INF/INDEX.LIST"
       excludes += "META-INF/io.netty.versions.properties"
       excludes += "META-INF/DEPENDENCIES"
+      excludes += "META-INF/version-control-info.textproto"
+      excludes += "META-INF/*.version"
+      excludes += "META-INF/*.kotlin_module"
+      excludes += "**/com/atilika/kuromoji/**"
     }
   }
 }
@@ -304,7 +312,8 @@ dependencies {
   "gmsImplementation"(libs.cast.framework)
 
   implementation(libs.room.runtime)
-  implementation(libs.kuromoji.ipadic)
+  // Removed Kuromoji to save 15MB APK size
+  // implementation(libs.kuromoji.ipadic)
   implementation(libs.tinypinyin)
 
   implementation(libs.room.ktx)

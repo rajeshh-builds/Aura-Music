@@ -60,40 +60,14 @@ fun WelcomeDialog(onDismissRequest: () -> Unit) {
 
         WelcomeSectionCard(title = "Developer") {
           WelcomeActionRow(
-            icon = painterResource(R.drawable.ic_instagram_new),
-            title = "Instagram",
-            subtitle = "@harinath_4496",
-            onClick = { uriHandler.openUri("https://www.instagram.com/harinath_4496") }
-          )
-          WelcomeDivider()
-          WelcomeActionRow(
-            icon = painterResource(R.drawable.github),
-            title = "GitHub",
-            subtitle = "harinath4496",
-            onClick = { uriHandler.openUri("https://github.com/harinath4496") }
+            icon = painterResource(R.drawable.star),
+            title = "Lead Developer",
+            subtitle = "Rajesh",
+            onClick = { }
           )
         }
 
         Spacer(modifier = Modifier.height(4.dp))
-
-        Button(
-          onClick = { uriHandler.openUri("https://github.com/harinath4496/IrahMusic") },
-          modifier = Modifier.fillMaxWidth().height(50.dp),
-          shape = RoundedCornerShape(16.dp),
-          colors =
-            ButtonDefaults.buttonColors(
-              containerColor = MaterialTheme.colorScheme.surfaceVariant,
-              contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        ) {
-          Icon(
-            painter = painterResource(id = R.drawable.star),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp)
-          )
-          Spacer(modifier = Modifier.width(8.dp))
-          Text("Star the Repo", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-        }
 
         Button(
           onClick = onDismissRequest,
@@ -105,7 +79,7 @@ fun WelcomeDialog(onDismissRequest: () -> Unit) {
               contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-          Text("Continue", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+          Text("Get Started", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
       }
     }
@@ -139,13 +113,13 @@ private fun WelcomeAppCard() {
       )
       Spacer(Modifier.height(4.dp))
       Text(
-        text = "IRAH Music",
+        text = "Aura Music",
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
       )
       Text(
-        text = "Crafted for Harinath • Powered by IRAH",
+        text = "Crafted for Rajesh • Aura Edition",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.Medium,
