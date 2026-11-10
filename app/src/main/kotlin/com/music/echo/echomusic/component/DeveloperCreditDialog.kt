@@ -83,7 +83,7 @@ fun DeveloperCreditDialog(
             }
 
             Text(
-              text = "Aura Music",
+              text = "MyTunes",
               style = MaterialTheme.typography.headlineMedium,
               fontWeight = FontWeight.ExtraBold,
               color = MaterialTheme.colorScheme.onSurface,

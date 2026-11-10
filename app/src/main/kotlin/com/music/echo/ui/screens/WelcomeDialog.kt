@@ -113,7 +113,7 @@ private fun WelcomeAppCard() {
       )
       Spacer(Modifier.height(4.dp))
       Text(
-        text = "Aura Music",
+        text = "MyTunes",
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,

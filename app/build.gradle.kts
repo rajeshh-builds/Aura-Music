@@ -209,7 +209,7 @@ android {
 
   packaging {
     jniLibs {
-      useLegacyPackaging = true
+      useLegacyPackaging = false
       keepDebugSymbols +=
         listOf("**/libandroidx.graphics.path.so", "**/libdatastore_shared_counter.so")
     }

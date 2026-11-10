@@ -473,6 +473,40 @@ fun LyricsMenu(
 
             add(
               Material3MenuItemData(
+                title = { Text(text = "Download Lyrics (.txt)") },
+                icon = {
+                  Icon(
+                    painter = painterResource(R.drawable.download),
+                    contentDescription = null,
+                  )
+                },
+                onClick = {
+                  val currentSong = songProvider()
+                  val meta = mediaMetadataProvider()
+                  val lyricsText = lyricsProvider()?.lyrics
+                  if (!lyricsText.isNullOrBlank()) {
+                    try {
+                      val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+                      val lyricsFolder = java.io.File(downloadsDir, "MyTunes_Lyrics")
+                      if (!lyricsFolder.exists()) lyricsFolder.mkdirs()
+                      val title = currentSong?.title ?: meta.title
+                      val artist = meta.artists.joinToString { it.name }
+                      val safeTitle = title.replace(Regex("[\\\\/:*?\"<>|]"), "_")
+                      val txtFile = java.io.File(lyricsFolder, "$safeTitle - Lyrics.txt")
+                      txtFile.writeText("Song: $title\nArtist: $artist\nSource: MyTunes\n\n$lyricsText")
+                      android.widget.Toast.makeText(context, "Lyrics saved to Downloads/MyTunes_Lyrics!", android.widget.Toast.LENGTH_LONG).show()
+                    } catch (e: Exception) {
+                      android.widget.Toast.makeText(context, "Failed to save: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                  } else {
+                    android.widget.Toast.makeText(context, "No lyrics available to download", android.widget.Toast.LENGTH_SHORT).show()
+                  }
+                }
+              )
+            )
+
+            add(
+              Material3MenuItemData(
                 title = { Text(text = stringResource(R.string.romanize_current_track)) },
                 icon = {
                   Icon(

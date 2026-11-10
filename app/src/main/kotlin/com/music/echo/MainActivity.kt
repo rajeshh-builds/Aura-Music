@@ -988,7 +988,7 @@ class MainActivity : ComponentActivity() {
 
         val currentTitle =
           when (navBackStackEntry?.destination?.route) {
-            Screens.Home.route -> "Aura Music"
+            Screens.Home.route -> "MyTunes"
             Screens.Search.route -> stringResource(R.string.search)
             Screens.Library.route -> stringResource(R.string.filter_library)
             Screens.ListenTogether.route -> stringResource(R.string.together)
@@ -1076,7 +1076,7 @@ class MainActivity : ComponentActivity() {
                       if (navBackStackEntry?.destination?.route == Screens.Home.route) {
                         Column {
                           Text(
-                            text = "Aura Music",
+                            text = "MyTunes",
                             style =
                               MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,

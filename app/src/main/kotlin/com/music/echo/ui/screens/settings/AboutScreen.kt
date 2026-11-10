@@ -177,7 +177,7 @@ fun AboutScreen(
               ),
               Material3SettingsItem(
                 icon = painterResource(R.drawable.star),
-                title = { Text("Aura Music Project") },
+                title = { Text("MyTunes Project") },
                 description = { Text("Emerald Pulse Open-Source Edition") },
                 onClick = { }
               )
@@ -280,7 +280,7 @@ private fun AboutAppCard() {
     Spacer(Modifier.height(4.dp))
 
     Text(
-      text = if (rotation <= 90f) "Aura Music" else "Crafted for Rajesh • Aura Edition",
+      text = if (rotation <= 90f) "MyTunes" else "Crafted for Rajesh • MyTunes Edition",
       style = MaterialTheme.typography.titleLarge,
       fontWeight = FontWeight.Bold,
       color = MaterialTheme.colorScheme.onSurface,

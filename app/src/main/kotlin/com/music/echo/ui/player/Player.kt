@@ -2421,6 +2421,39 @@ fun BottomSheetPlayer(
                   label = "rotation"
                 )
 
+              // Glowing Pulse Wave Animation for MyTunes
+              val pulseScale by
+                infiniteTransition.animateFloat(
+                  initialValue = 1f,
+                  targetValue = if (effectiveIsPlaying) 1.15f else 1f,
+                  animationSpec =
+                    infiniteRepeatable(
+                      animation = tween(1200, easing = LinearOutSlowInEasing),
+                      repeatMode = RepeatMode.Reverse
+                    ),
+                  label = "pulseScale"
+                )
+
+              Box(contentAlignment = Alignment.Center) {
+                if (effectiveIsPlaying) {
+                  Box(
+                    modifier =
+                      Modifier.size(100.dp)
+                        .graphicsLayer {
+                          scaleX = pulseScale
+                          scaleY = pulseScale
+                          alpha = 0.35f
+                        }
+                        .background(
+                          brush =
+                            Brush.radialGradient(
+                              colors = listOf(textButtonColor, Color.Transparent)
+                            ),
+                          shape = CircleShape
+                        )
+                  )
+                }
+
               FilledIconButton(
                 onClick = {
                   if (isListenTogetherGuest) {
@@ -2478,6 +2511,7 @@ fun BottomSheetPlayer(
                     modifier = Modifier.size(36.dp)
                   )
                 }
+              }
               }
 
               Spacer(modifier = Modifier.width(24.dp))

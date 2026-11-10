@@ -1051,7 +1051,8 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
             null
           }) ?: true
         val dataSaver = it[echo.music.iad1tya.constants.DataSaverEnabledKey] ?: false
-        if (dataSaver) false else preload
+        // Keep 1 song preload active even on DataSaver so skip latency is instant (0ms)
+        preload
       }
       .distinctUntilChanged()
       .collect(scope) { cachedPreloadEnabled = it }
