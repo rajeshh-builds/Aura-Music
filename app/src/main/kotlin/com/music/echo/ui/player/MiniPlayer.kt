@@ -893,8 +893,18 @@ private fun LegacyMiniPlayer(progressState: ProgressState, modifier: Modifier = 
             mediaMetadata = it,
             pureBlack = pureBlack,
             modifier = Modifier.padding(horizontal = 6.dp),
+            playerConnection = playerConnection,
+            castHandler = castHandler,
+            isCasting = isCasting,
           )
         }
+      }
+
+      IconButton(
+        enabled = canSkipPrevious && !isListenTogetherGuest,
+        onClick = if (isListenTogetherGuest) ({}) else ({ playerConnection.player.seekToPreviousMediaItem() }),
+      ) {
+        Icon(painter = painterResource(R.drawable.skip_previous), contentDescription = null)
       }
 
       LegacyPlayPauseButton(
@@ -991,26 +1001,87 @@ private fun LegacyMiniMediaInfo(
   mediaMetadata: MediaMetadata,
   pureBlack: Boolean,
   modifier: Modifier = Modifier,
+  playerConnection: PlayerConnection =
+    LocalPlayerConnection.current ?: error("No PlayerConnection provided"),
+  castHandler: CastConnectionHandler? = null,
+  isCasting: Boolean = false,
 ) {
   val error by
     LocalPlayerConnection.current?.error?.collectAsState() ?: remember { mutableStateOf(null) }
   val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+
+  val isPlaying by playerConnection.isPlaying.collectAsState()
+  val castIsPlaying by
+    castHandler?.castIsPlaying?.collectAsState() ?: remember { mutableStateOf(false) }
+  val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
+
+  // Rotating vinyl angle
+  val infiniteTransition = rememberInfiniteTransition(label = "legacyMiniVinylRotation")
+  val rotationAngle by infiniteTransition.animateFloat(
+    initialValue = 0f,
+    targetValue = 360f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 8000, easing = LinearEasing),
+      repeatMode = RepeatMode.Restart
+    ),
+    label = "legacyVinylAngle"
+  )
+  val currentRotation = if (effectiveIsPlaying) rotationAngle else 0f
+
+  // 3-Bar Equalizer animation
+  val bar1Height by infiniteTransition.animateFloat(
+    initialValue = 0.3f,
+    targetValue = 1.0f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 420, easing = LinearOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "legacyBar1"
+  )
+  val bar2Height by infiniteTransition.animateFloat(
+    initialValue = 0.9f,
+    targetValue = 0.2f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 560, easing = LinearOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "legacyBar2"
+  )
+  val bar3Height by infiniteTransition.animateFloat(
+    initialValue = 0.4f,
+    targetValue = 0.85f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 350, easing = LinearOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "legacyBar3"
+  )
 
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier,
   ) {
     Box(
-      modifier = Modifier.padding(6.dp).size(48.dp).clip(RoundedCornerShape(ThumbnailCornerRadius))
+      modifier = Modifier.padding(6.dp).size(48.dp)
     ) {
-      Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant))
-
-      AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(mediaMetadata.thumbnailUrl).build(),
-        contentDescription = null,
-        contentScale = if (cropAlbumArt) ContentScale.Crop else ContentScale.Fit,
-        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(ThumbnailCornerRadius)),
-      )
+      Box(
+        modifier = Modifier.fillMaxSize()
+          .graphicsLayer { rotationZ = currentRotation }
+          .clip(CircleShape)
+          .border(
+            1.5.dp,
+            if (effectiveIsPlaying) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+            else MaterialTheme.colorScheme.surfaceVariant,
+            CircleShape
+          )
+      ) {
+        AsyncImage(
+          model = ImageRequest.Builder(LocalContext.current).data(mediaMetadata.thumbnailUrl).build(),
+          contentDescription = null,
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.fillMaxSize().clip(CircleShape),
+        )
+      }
 
       androidx.compose.animation.AnimatedVisibility(
         visible = error != null,
@@ -1021,7 +1092,7 @@ private fun LegacyMiniMediaInfo(
           Modifier.fillMaxSize()
             .background(
               color = if (pureBlack) Color.Black else Color.Black.copy(alpha = 0.6f),
-              shape = RoundedCornerShape(ThumbnailCornerRadius),
+              shape = CircleShape,
             ),
         ) {
           Icon(
@@ -1037,15 +1108,47 @@ private fun LegacyMiniMediaInfo(
     Column(
       modifier = Modifier.weight(1f).padding(horizontal = 6.dp),
     ) {
-      Text(
-        text = mediaMetadata.title,
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.basicMarquee(),
-      )
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        if (effectiveIsPlaying) {
+          Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.padding(end = 6.dp).height(12.dp)
+          ) {
+            Box(
+              modifier = Modifier
+                .width(2.5.dp)
+                .fillMaxHeight(bar1Height)
+                .clip(RoundedCornerShape(1.dp))
+                .background(MaterialTheme.colorScheme.primary)
+            )
+            Box(
+              modifier = Modifier
+                .width(2.5.dp)
+                .fillMaxHeight(bar2Height)
+                .clip(RoundedCornerShape(1.dp))
+                .background(MaterialTheme.colorScheme.primary)
+            )
+            Box(
+              modifier = Modifier
+                .width(2.5.dp)
+                .fillMaxHeight(bar3Height)
+                .clip(RoundedCornerShape(1.dp))
+                .background(MaterialTheme.colorScheme.primary)
+            )
+          }
+        }
+
+        Text(
+          text = mediaMetadata.title,
+          color = MaterialTheme.colorScheme.onSurface,
+          fontSize = 15.sp,
+          fontWeight = FontWeight.Bold,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.basicMarquee(),
+        )
+      }
 
       if (mediaMetadata.artists.any { it.name.isNotBlank() }) {
         Text(

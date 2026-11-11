@@ -2,22 +2,34 @@
 package echo.music.iad1tya.ui.player
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -199,39 +211,193 @@ fun FloatingMiniPlayer(
             vertical = if (isInline) 4.dp else 8.dp,
           ),
     ) {
-      AsyncImage(
-        model = mediaMetadata?.thumbnailUrl,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.size(artSize).clip(RoundedCornerShape(artCornerRadius)),
+      // Rotating Vinyl Disc Animation
+      val infiniteTransition = rememberInfiniteTransition(label = "floatingVinylRotation")
+      val rotationAngle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+          animation = tween(durationMillis = 8000, easing = LinearEasing),
+          repeatMode = RepeatMode.Restart
+        ),
+        label = "floatingVinylAngle"
       )
+
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .size(artSize)
+          .clip(CircleShape)
+          .background(Color(0xFF0F1713))
+          .border(1.dp, Color(0xFF1DB954).copy(alpha = 0.4f), CircleShape)
+      ) {
+        AsyncImage(
+          model = mediaMetadata?.thumbnailUrl,
+          contentDescription = null,
+          contentScale = ContentScale.Crop,
+          modifier = Modifier
+            .size(artSize)
+            .graphicsLayer {
+              rotationZ = if (isPlaying) rotationAngle else 0f
+            }
+            .clip(CircleShape),
+        )
+        // Center spindle hole
+        Box(
+          modifier = Modifier
+            .size(8.dp)
+            .clip(CircleShape)
+            .background(Color(0xFF060907))
+            .border(1.dp, Color(0xFF1DB954), CircleShape)
+        )
+      }
 
       Spacer(Modifier.width(if (isInline) 8.dp else 12.dp))
 
+      // Equalizer bars state
+      val eq1 by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+          animation = tween(450, easing = LinearEasing),
+          repeatMode = RepeatMode.Reverse
+        ),
+        label = "eq1"
+      )
+      val eq2 by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 0.9f,
+        animationSpec = infiniteRepeatable(
+          animation = tween(350, easing = LinearEasing),
+          repeatMode = RepeatMode.Reverse
+        ),
+        label = "eq2"
+      )
+      val eq3 by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+          animation = tween(550, easing = LinearEasing),
+          repeatMode = RepeatMode.Reverse
+        ),
+        label = "eq3"
+      )
+
       if (isInline) {
-        Text(
-          text = mediaMetadata?.title.orEmpty(),
-          style = MaterialTheme.typography.bodySmall,
-          color = contentColor,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          modifier = Modifier.weight(1f),
-        )
-      } else {
-        Column(modifier = Modifier.weight(1f)) {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.weight(1f)
+        ) {
           Text(
             text = mediaMetadata?.title.orEmpty(),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = contentColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
           )
-          Text(
-            text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
-            style = MaterialTheme.typography.bodySmall,
-            color = contentColor.copy(alpha = 0.7f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+          if (isPlaying) {
+            Spacer(Modifier.width(6.dp))
+            Row(
+              horizontalArrangement = Arrangement.spacedBy(2.dp),
+              verticalAlignment = Alignment.Bottom,
+              modifier = Modifier.height(14.dp)
+            ) {
+              val emeraldColor = Color(0xFF1DB954)
+              Canvas(modifier = Modifier.width(2.5.dp).height(14.dp)) {
+                drawRoundRect(
+                  color = emeraldColor,
+                  size = androidx.compose.ui.geometry.Size(size.width, size.height * eq1),
+                  topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - eq1)),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+              }
+              Canvas(modifier = Modifier.width(2.5.dp).height(14.dp)) {
+                drawRoundRect(
+                  color = emeraldColor,
+                  size = androidx.compose.ui.geometry.Size(size.width, size.height * eq2),
+                  topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - eq2)),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+              }
+              Canvas(modifier = Modifier.width(2.5.dp).height(14.dp)) {
+                drawRoundRect(
+                  color = emeraldColor,
+                  size = androidx.compose.ui.geometry.Size(size.width, size.height * eq3),
+                  topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - eq3)),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+              }
+            }
+          }
+        }
+      } else {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.weight(1f)
+        ) {
+          Column(modifier = Modifier.weight(1f)) {
+            Text(
+              text = mediaMetadata?.title.orEmpty(),
+              style = MaterialTheme.typography.bodyMedium,
+              color = contentColor,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+              text = mediaMetadata?.artists?.joinToString { it.name }.orEmpty(),
+              style = MaterialTheme.typography.bodySmall,
+              color = contentColor.copy(alpha = 0.7f),
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
+          }
+          if (isPlaying) {
+            Spacer(Modifier.width(6.dp))
+            Row(
+              horizontalArrangement = Arrangement.spacedBy(2.5.dp),
+              verticalAlignment = Alignment.Bottom,
+              modifier = Modifier.height(16.dp).padding(end = 4.dp)
+            ) {
+              val emeraldColor = Color(0xFF1DB954)
+              Canvas(modifier = Modifier.width(3.dp).height(16.dp)) {
+                drawRoundRect(
+                  color = emeraldColor,
+                  size = androidx.compose.ui.geometry.Size(size.width, size.height * eq1),
+                  topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - eq1)),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+              }
+              Canvas(modifier = Modifier.width(3.dp).height(16.dp)) {
+                drawRoundRect(
+                  color = emeraldColor,
+                  size = androidx.compose.ui.geometry.Size(size.width, size.height * eq2),
+                  topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - eq2)),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+              }
+              Canvas(modifier = Modifier.width(3.dp).height(16.dp)) {
+                drawRoundRect(
+                  color = emeraldColor,
+                  size = androidx.compose.ui.geometry.Size(size.width, size.height * eq3),
+                  topLeft = androidx.compose.ui.geometry.Offset(0f, size.height * (1f - eq3)),
+                  cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+              }
+            }
+          }
+        }
+      }
+
+      if (!isInline) {
+        IconButton(
+          onClick = { playerConnection.player.seekToPreviousMediaItem() },
+          modifier = Modifier.size(controlSize),
+        ) {
+          Icon(
+            painter = painterResource(R.drawable.skip_previous),
+            contentDescription = null,
+            tint = contentColor,
           )
         }
       }
