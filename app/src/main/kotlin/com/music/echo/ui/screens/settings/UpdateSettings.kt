@@ -140,7 +140,7 @@ fun UpdateSettings(
     )
 
     Text(
-      text = "Check and install updates directly from inside IRAH Music.",
+      text = "Check and install updates directly from inside MyTunes.",
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)

@@ -71,7 +71,7 @@ class CrashHandler private constructor(private val applicationContext: Context) 
       StringWriter().apply { throwable.printStackTrace(PrintWriter(this)) }.toString()
 
     return buildString {
-      appendLine("IRAH Music Crash Report")
+      appendLine("MyTunes Crash Report")
       appendLine("=".repeat(50))
       appendLine()
       appendLine("Manufacturer: ${Build.MANUFACTURER}")

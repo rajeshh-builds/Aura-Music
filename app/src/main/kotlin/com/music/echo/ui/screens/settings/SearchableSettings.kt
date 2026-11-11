@@ -2274,12 +2274,12 @@ fun getAllSearchableSettings(): List<SearchableSetting> {
     ),
 
     // About Screen - Social & Support Links
-    SearchableSetting("Website", "Visit the IRAH Music website", "About", "settings/about"),
-    SearchableSetting("Instagram", "Follow IRAH Music on Instagram", "About", "settings/about"),
-    SearchableSetting("X (Twitter)", "Follow IRAH Music on X", "About", "settings/about"),
+    SearchableSetting("Website", "Visit the MyTunes website", "About", "settings/about"),
+    SearchableSetting("Instagram", "Follow MyTunes on Instagram", "About", "settings/about"),
+    SearchableSetting("X (Twitter)", "Follow MyTunes on X", "About", "settings/about"),
     SearchableSetting("Buy Me a Coffee", "Support the developer", "About", "settings/about"),
     SearchableSetting("Patreon", "Support the developer on Patreon", "About", "settings/about"),
     SearchableSetting("UPI", "Support the developer via UPI", "About", "settings/about"),
-    SearchableSetting("Discord", "Join the IRAH Music community", "About", "settings/about"),
+    SearchableSetting("Discord", "Join the MyTunes community", "About", "settings/about"),
   )
 }

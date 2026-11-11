@@ -699,11 +699,15 @@ class MainActivity : ComponentActivity() {
         val (useNewMiniPlayerDesign) =
           rememberPreference(UseNewMiniPlayerDesignKey, defaultValue = true)
         LaunchedEffect(Unit) {
-          val migratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("mytunes_ui_migrated_v1")
+          val migratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("mytunes_ui_migrated_v2")
           dataStore.edit { prefs ->
             if (prefs[migratedKey] != true) {
               prefs[UseNewMiniPlayerDesignKey] = true
+              prefs[UseFloatingNavBarKey] = true
+              prefs[LiquidGlassGlobalEnabledKey] = true
               prefs[LiquidGlassMiniPlayerEnabledKey] = true
+              prefs[LiquidGlassPlayerEnabledKey] = true
+              prefs[LiquidGlassNavBarEnabledKey] = true
               prefs[MiniPlayerBackgroundStyleKey] = PlayerBackgroundStyle.GLOW_ANIMATED.name
               prefs[PureBlackMiniPlayerKey] = true
               prefs[PureBlackKey] = true
@@ -1014,7 +1018,7 @@ class MainActivity : ComponentActivity() {
 
         val baseBg = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
 
-        val (liquidGlassGlobalEnabled) = rememberPreference(LiquidGlassGlobalEnabledKey, defaultValue = false)
+        val (liquidGlassGlobalEnabled) = rememberPreference(LiquidGlassGlobalEnabledKey, defaultValue = true)
         val (liquidGlassVibrancy) = rememberPreference(LiquidGlassVibrancyKey, defaultValue = 1f)
         val (liquidGlassBlurRadius) = rememberPreference(LiquidGlassBlurRadiusKey, defaultValue = 8f)
         val (liquidGlassLensHeight) = rememberPreference(LiquidGlassLensHeightKey, defaultValue = 0.5f)
