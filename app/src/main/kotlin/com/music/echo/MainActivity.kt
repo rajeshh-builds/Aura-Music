@@ -698,6 +698,19 @@ class MainActivity : ComponentActivity() {
           }
         val (useNewMiniPlayerDesign) =
           rememberPreference(UseNewMiniPlayerDesignKey, defaultValue = true)
+        LaunchedEffect(Unit) {
+          val migratedKey = androidx.datastore.preferences.core.booleanPreferencesKey("mytunes_ui_migrated_v1")
+          dataStore.edit { prefs ->
+            if (prefs[migratedKey] != true) {
+              prefs[UseNewMiniPlayerDesignKey] = true
+              prefs[LiquidGlassMiniPlayerEnabledKey] = true
+              prefs[MiniPlayerBackgroundStyleKey] = PlayerBackgroundStyle.GLOW_ANIMATED.name
+              prefs[PureBlackMiniPlayerKey] = true
+              prefs[PureBlackKey] = true
+              prefs[migratedKey] = true
+            }
+          }
+        }
         val defaultOpenTab = remember {
           dataStore[DefaultOpenTabKey].toEnum(defaultValue = NavigationTab.HOME)
         }
