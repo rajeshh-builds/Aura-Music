@@ -341,7 +341,7 @@ fun UpdateScreen(navController: NavHostController) {
                     } else {
                       val urlToDownload =
                         currentStatus.apkUrl
-                          ?: "https://github.com/rajesh/AuraMusic/releases/download/${currentStatus.version}/IRAH_Music-${currentStatus.version}-arm64-release.apk"
+                          ?: "https://github.com/rajeshh-builds/Aura-Music/releases/download/${currentStatus.version}/IRAH_Music-${currentStatus.version}-arm64-release.apk"
 
                       val constraints =
                         Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
@@ -699,7 +699,7 @@ suspend fun originalCheckForUpdateDisabled(
 ) {
   withContext(Dispatchers.IO) {
     try {
-      val url = URL("https://api.github.com/repos/rajesh/AuraMusic/releases/latest")
+      val url = URL("https://api.github.com/repos/rajeshh-builds/Aura-Music/releases/latest")
       val json = url.openStream().bufferedReader().use { it.readText() }
       val targetRelease = JSONObject(json)
 
@@ -719,7 +719,7 @@ suspend fun originalCheckForUpdateDisabled(
         try {
           val changelogUrl =
             URL(
-              "https://github.com/rajesh/AuraMusic/releases/download/$tagWithPrefix/changelog.json"
+              "https://github.com/rajeshh-builds/Aura-Music/releases/download/$tagWithPrefix/changelog.json"
             )
           val changelogJson = changelogUrl.openStream().bufferedReader().use { it.readText() }
           val changelogData = JSONObject(changelogJson)
@@ -847,7 +847,7 @@ suspend fun fetchChangelogForVersion(currentVersion: String): WhatsNewInfo? =
     try {
       val cleanCurrent = currentVersion.removePrefix("b").removePrefix("v").trim()
       val releasesJson =
-        openTimedStream("https://api.github.com/repos/rajesh/AuraMusic/releases")
+        openTimedStream("https://api.github.com/repos/rajeshh-builds/Aura-Music/releases")
           .bufferedReader()
           .use { it.readText() }
       val releases = JSONArray(releasesJson)
@@ -869,7 +869,7 @@ suspend fun fetchChangelogForVersion(currentVersion: String): WhatsNewInfo? =
       try {
         val changelogJson =
           openTimedStream(
-              "https://github.com/rajesh/AuraMusic/releases/download/$tag/changelog.json"
+              "https://github.com/rajeshh-builds/Aura-Music/releases/download/$tag/changelog.json"
             )
             .bufferedReader()
             .use { it.readText() }

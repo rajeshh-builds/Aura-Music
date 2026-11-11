@@ -102,7 +102,7 @@ fun CommitScreen(navController: NavController, scrollBehavior: TopAppBarScrollBe
       try {
         val url =
           URL(
-            "https://api.github.com/repos/rajesh/AuraMusic/commits?branch=main&per_page=50"
+            "https://api.github.com/repos/rajeshh-builds/Aura-Music/commits?branch=main&per_page=50"
           )
         val json = url.openStream().bufferedReader().use { it.readText() }
         val array = JSONArray(json)
