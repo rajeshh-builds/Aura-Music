@@ -17,7 +17,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -886,7 +888,7 @@ class MainActivity : ComponentActivity() {
             }
           } else {
             if (playerBottomSheetState.isDismissed) {
-              playerBottomSheetState.collapseSoft()
+              playerBottomSheetState.collapse(spring(stiffness = Spring.StiffnessHigh))
             }
           }
         }
@@ -899,12 +901,9 @@ class MainActivity : ComponentActivity() {
                 mediaItem: MediaItem?,
                 reason: Int,
               ) {
-                if (
-                  reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED &&
-                    mediaItem != null &&
-                    playerBottomSheetState.isDismissed
-                ) {
-                  playerBottomSheetState.collapseSoft()
+                if (mediaItem != null && playerBottomSheetState.isDismissed) {
+                  // Instant snappy pop-up without waiting for slow spring animation
+                  playerBottomSheetState.collapse(spring(stiffness = Spring.StiffnessHigh))
                 }
               }
             }

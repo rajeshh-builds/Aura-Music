@@ -22,11 +22,19 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -192,7 +200,7 @@ fun MiniPlayer(
     val miniPlayerBackground by
       rememberEnumPreference(
         MiniPlayerBackgroundStyleKey,
-        defaultValue = PlayerBackgroundStyle.DEFAULT
+        defaultValue = PlayerBackgroundStyle.GLOW_ANIMATED
       )
     val pureBlackMini by rememberPreference(PureBlackMiniPlayerKey, defaultValue = true)
 
@@ -267,7 +275,7 @@ private fun NewMiniPlayer(progressState: ProgressState, modifier: Modifier = Mod
   val miniPlayerBackground by
     rememberEnumPreference(
       MiniPlayerBackgroundStyleKey,
-      defaultValue = PlayerBackgroundStyle.DEFAULT
+      defaultValue = PlayerBackgroundStyle.GLOW_ANIMATED
     )
 
   val pureBlackGlobalPref by
@@ -296,6 +304,11 @@ private fun NewMiniPlayer(progressState: ProgressState, modifier: Modifier = Mod
   val isCasting by castHandler?.isCasting?.collectAsState() ?: remember { mutableStateOf(false) }
   val castDeviceName by
     castHandler?.castDeviceName?.collectAsState() ?: remember { mutableStateOf(null) }
+
+  val isPlaying by playerConnection.isPlaying.collectAsState()
+  val castIsPlaying by
+    castHandler?.castIsPlaying?.collectAsState() ?: remember { mutableStateOf(false) }
+  val effectiveIsPlaying = if (isCasting) castIsPlaying else isPlaying
 
   val context = LocalContext.current
   val isBluetoothConnected = isBluetoothHeadphoneConnected(context)
@@ -455,6 +468,7 @@ private fun NewMiniPlayer(progressState: ProgressState, modifier: Modifier = Mod
           mediaMetadata = mediaMetadata,
           primaryColor = primaryColor,
           outlineColor = outlineColor,
+          isPlaying = effectiveIsPlaying,
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -463,6 +477,8 @@ private fun NewMiniPlayer(progressState: ProgressState, modifier: Modifier = Mod
           mediaMetadata = mediaMetadata,
           onSurfaceColor = onSurfaceColor,
           errorColor = errorColor,
+          primaryColor = primaryColor,
+          isPlaying = effectiveIsPlaying,
           modifier = Modifier.weight(1f)
         )
 
@@ -514,9 +530,23 @@ private fun NewMiniPlayerThumbnail(
   mediaMetadata: MediaMetadata?,
   primaryColor: Color,
   outlineColor: Color,
+  isPlaying: Boolean = false,
 ) {
   val trackColor = outlineColor.copy(alpha = 0.2f)
   val strokeWidth = 3.dp
+
+  // Interactive Vinyl Spinning Rotation
+  val infiniteTransition = rememberInfiniteTransition(label = "miniPlayerVinylRotation")
+  val rotationAngle by infiniteTransition.animateFloat(
+    initialValue = 0f,
+    targetValue = 360f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 8000, easing = LinearEasing),
+      repeatMode = RepeatMode.Restart
+    ),
+    label = "vinylAngle"
+  )
+  val currentRotation = if (isPlaying) rotationAngle else 0f
 
   Box(
     contentAlignment = Alignment.Center,
@@ -556,8 +586,9 @@ private fun NewMiniPlayerThumbnail(
       contentAlignment = Alignment.Center,
       modifier =
         Modifier.size(40.dp)
+          .graphicsLayer { rotationZ = currentRotation }
           .clip(CircleShape)
-          .border(1.dp, outlineColor.copy(alpha = 0.3f), CircleShape)
+          .border(1.5.dp, if (isPlaying) primaryColor.copy(alpha = 0.6f) else outlineColor.copy(alpha = 0.3f), CircleShape)
     ) {
       mediaMetadata?.let { metadata ->
         AsyncImage(
@@ -567,6 +598,14 @@ private fun NewMiniPlayerThumbnail(
           modifier = Modifier.fillMaxSize().clip(CircleShape)
         )
       }
+      // Vinyl Center Pin Accent
+      Box(
+        modifier = Modifier
+          .size(8.dp)
+          .clip(CircleShape)
+          .background(Color.Black.copy(alpha = 0.85f))
+          .border(1.dp, primaryColor.copy(alpha = 0.8f), CircleShape)
+      )
     }
   }
 }
@@ -576,23 +615,86 @@ private fun NewMiniPlayerSongInfo(
   mediaMetadata: MediaMetadata?,
   onSurfaceColor: Color,
   errorColor: Color,
+  primaryColor: Color = MaterialTheme.colorScheme.primary,
+  isPlaying: Boolean = false,
   modifier: Modifier = Modifier
 ) {
   val error by
     LocalPlayerConnection.current?.error?.collectAsState() ?: remember { mutableStateOf(null) }
 
+  // 3-Bar Live Jumping Equalizer Animation
+  val infiniteTransition = rememberInfiniteTransition(label = "miniEqualizerBars")
+  val bar1Height by infiniteTransition.animateFloat(
+    initialValue = 0.3f,
+    targetValue = 1.0f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 420, easing = LinearOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "bar1"
+  )
+  val bar2Height by infiniteTransition.animateFloat(
+    initialValue = 0.9f,
+    targetValue = 0.2f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 560, easing = LinearOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "bar2"
+  )
+  val bar3Height by infiniteTransition.animateFloat(
+    initialValue = 0.4f,
+    targetValue = 0.85f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(durationMillis = 350, easing = LinearOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "bar3"
+  )
+
   Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
     mediaMetadata?.let { metadata ->
-      Text(
-        text = metadata.title,
-        color = onSurfaceColor,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier =
-          Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
-      )
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        if (isPlaying) {
+          Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.padding(end = 6.dp).height(12.dp)
+          ) {
+            Box(
+              modifier = Modifier
+                .width(2.5.dp)
+                .fillMaxHeight(bar1Height)
+                .clip(RoundedCornerShape(1.dp))
+                .background(primaryColor)
+            )
+            Box(
+              modifier = Modifier
+                .width(2.5.dp)
+                .fillMaxHeight(bar2Height)
+                .clip(RoundedCornerShape(1.dp))
+                .background(primaryColor)
+            )
+            Box(
+              modifier = Modifier
+                .width(2.5.dp)
+                .fillMaxHeight(bar3Height)
+                .clip(RoundedCornerShape(1.dp))
+                .background(primaryColor)
+            )
+          }
+        }
+        Text(
+          text = metadata.title,
+          color = onSurfaceColor,
+          fontSize = 14.sp,
+          fontWeight = FontWeight.SemiBold,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          modifier =
+            Modifier.basicMarquee(iterations = 1, initialDelayMillis = 3000, velocity = 30.dp),
+        )
+      }
       Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -638,7 +740,7 @@ private fun LegacyMiniPlayer(progressState: ProgressState, modifier: Modifier = 
   val miniPlayerBackground by
     rememberEnumPreference(
       MiniPlayerBackgroundStyleKey,
-      defaultValue = PlayerBackgroundStyle.DEFAULT
+      defaultValue = PlayerBackgroundStyle.GLOW_ANIMATED
     )
 
   val pureBlackGlobalPref by
