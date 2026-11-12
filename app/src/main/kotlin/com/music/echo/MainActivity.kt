@@ -696,6 +696,59 @@ class MainActivity : ComponentActivity() {
               Screens.MainScreens
             }
           }
+        var showStartupUpdateDialog by remember { mutableStateOf(false) }
+        var startupUpdateTag by remember { mutableStateOf("") }
+        var startupUpdateSize by remember { mutableStateOf("") }
+        var startupUpdateApkUrl by remember { mutableStateOf<String?>(null) }
+
+        LaunchedEffect(Unit) {
+          checkForUpdate(
+            context = this@MainActivity,
+            onSuccess = { latestVersion, hasUpdate, _, apkSize, _, _, _, apkUrl ->
+              if (hasUpdate && !apkUrl.isNullOrEmpty()) {
+                startupUpdateTag = latestVersion
+                startupUpdateSize = apkSize
+                startupUpdateApkUrl = apkUrl
+                showStartupUpdateDialog = true
+              }
+            },
+            onError = {}
+          )
+        }
+
+        if (showStartupUpdateDialog && startupUpdateApkUrl != null) {
+          androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showStartupUpdateDialog = false },
+            title = {
+              androidx.compose.material3.Text(
+                text = "MyTunes Update Available ($startupUpdateTag)",
+                style = MaterialTheme.typography.titleLarge
+              )
+            },
+            text = {
+              androidx.compose.material3.Text(
+                text = "A new version of MyTunes ($startupUpdateSize MB) is ready with the latest features and fixes. Download and install now?"
+              )
+            },
+            confirmButton = {
+              androidx.compose.material3.TextButton(
+                onClick = {
+                  showStartupUpdateDialog = false
+                  val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(startupUpdateApkUrl))
+                  startActivity(intent)
+                }
+              ) {
+                androidx.compose.material3.Text("Update Now", color = Color(0xFF1DB954))
+              }
+            },
+            dismissButton = {
+              androidx.compose.material3.TextButton(onClick = { showStartupUpdateDialog = false }) {
+                androidx.compose.material3.Text("Later")
+              }
+            }
+          )
+        }
+
         val (useNewMiniPlayerDesign) =
           rememberPreference(UseNewMiniPlayerDesignKey, defaultValue = true)
         LaunchedEffect(Unit) {
