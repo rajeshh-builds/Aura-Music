@@ -2,6 +2,10 @@ package echo.music.iad1tya.ui.screens.settings
 
 import android.content.Intent
 import android.net.Uri
+import kotlinx.coroutines.withContext
+import echo.music.iad1tya.echomusic.updater.saveUpdateAvailableState
+import echo.music.iad1tya.echomusic.updater.getUpdateAvailableState
+import echo.music.iad1tya.echomusic.updater.isNewerVersion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +78,7 @@ fun UpdateSettings(
     mutableStateOf(getUpdateNotificationsSetting(context))
   }
   var betaUpdatesEnabled by remember { mutableStateOf(getBetaUpdatesSetting(context)) }
-  val isUpdateAvailable = getUpdateAvailableState(context) && autoUpdateEnabled
+  var isUpdateAvailable by remember { mutableStateOf(getUpdateAvailableState(context) && autoUpdateEnabled) }
   var apkCount by remember { mutableStateOf(getDownloadedApkCount(context)) }
   var showInfoDialog by remember { mutableStateOf(false) }
   var releaseNotes by remember { mutableStateOf<String?>(null) }
@@ -87,9 +91,23 @@ fun UpdateSettings(
       try {
         val url =
           java.net.URL("https://api.github.com/repos/rajeshh-builds/Aura-Music/releases/latest")
-        val json = url.openStream().bufferedReader().use { it.readText() }
+        val connection = url.openConnection() as java.net.HttpURLConnection
+        connection.setRequestProperty("User-Agent", "MyTunes-Android")
+        connection.connectTimeout = 10000
+        connection.readTimeout = 10000
+
+        val json = connection.inputStream.bufferedReader().use { it.readText() }
         val targetRelease = JSONObject(json)
-        releaseNotes = targetRelease.getString("body")
+        val body = targetRelease.optString("body", "")
+        val tagName = targetRelease.getString("tag_name")
+        val currentVersion = echo.music.iad1tya.BuildConfig.VERSION_NAME
+        val hasUpdate = echo.music.iad1tya.echomusic.updater.isNewerVersion(tagName, currentVersion)
+        
+        withContext(kotlinx.coroutines.Dispatchers.Main) {
+          releaseNotes = body
+          isUpdateAvailable = hasUpdate
+          saveUpdateAvailableState(context, hasUpdate)
+        }
       } catch (e: Exception) {
         e.printStackTrace()
       }

@@ -674,10 +674,62 @@ suspend fun checkForUpdate(
 ) {
   withContext(Dispatchers.IO) {
     try {
-      // Automatic update checking disabled in custom developer build
-      onSuccess(BuildConfig.VERSION_NAME, false, emptyList(), "", "", null, null, null)
+      val url = URL("https://api.github.com/repos/rajeshh-builds/Aura-Music/releases/latest")
+      val connection = url.openConnection() as java.net.HttpURLConnection
+      connection.setRequestProperty("User-Agent", "MyTunes-Android")
+      connection.connectTimeout = 10000
+      connection.readTimeout = 10000
+      
+      val json = connection.inputStream.bufferedReader().use { it.readText() }
+      val targetRelease = JSONObject(json)
+
+      val currentVersion = BuildConfig.VERSION_NAME
+      val targetTagName = targetRelease.getString("tag_name")
+      val hasUpdate = isNewerVersion(targetTagName, currentVersion)
+
+      val changelogList = mutableListOf<ChangelogSection>()
+      var description: String? = null
+      var imageUrl: String? = null
+      
+      val body = targetRelease.optString("body", "Bug fixes and improvements")
+      val (parsedDesc, parsedSections) = parseMarkdownToSections(body)
+      description = parsedDesc ?: body.takeIf { parsedSections.isEmpty() }
+      changelogList.addAll(parsedSections)
+
+      val publishedAt = targetRelease.optString("published_at", "")
+      val formattedReleaseDate = formatGitHubDate(publishedAt)
+      val assets = targetRelease.getJSONArray("assets")
+
+      var apkSizeInMB = ""
+      var apkDownloadUrl = ""
+      for (j in 0 until assets.length()) {
+        val asset = assets.getJSONObject(j)
+        val assetName = asset.getString("name").lowercase()
+        if (assetName.endsWith(".apk")) {
+          val apkSizeInBytes = asset.getLong("size")
+          apkSizeInMB = String.format("%.1f", apkSizeInBytes / (1024.0 * 1024.0))
+          apkDownloadUrl = asset.getString("browser_download_url")
+          break
+        }
+      }
+
+      withContext(Dispatchers.Main) {
+        onSuccess(
+          targetTagName,
+          hasUpdate,
+          changelogList,
+          apkSizeInMB,
+          formattedReleaseDate,
+          description,
+          imageUrl,
+          apkDownloadUrl.ifEmpty { null }
+        )
+      }
     } catch (e: Exception) {
-      onError()
+      e.printStackTrace()
+      withContext(Dispatchers.Main) {
+        onError()
+      }
     }
   }
 }
