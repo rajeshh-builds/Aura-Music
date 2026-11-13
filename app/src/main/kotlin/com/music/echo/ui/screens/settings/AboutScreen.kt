@@ -2,6 +2,8 @@
 
 package echo.music.iad1tya.ui.screens.settings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -166,7 +168,7 @@ fun AboutScreen(
 
       item {
         Material3SettingsGroup(
-          title = "Developer",
+          title = "Developer & Support",
           items =
             listOf(
               Material3SettingsItem(
@@ -177,9 +179,23 @@ fun AboutScreen(
               ),
               Material3SettingsItem(
                 icon = painterResource(R.drawable.star),
+                title = { Text("Support Rajesh (Buy a Coffee)") },
+                description = { Text("Support MyTunes development via UPI") },
+                onClick = {
+                  try {
+                    val upiUri = Uri.parse("upi://pay?pa=rajesh@upi&pn=Rajesh&tn=Support%20MyTunes")
+                    val intent = Intent(Intent.ACTION_VIEW, upiUri)
+                    context.startActivity(intent)
+                  } catch (e: Exception) {
+                    uriHandler.openUri("https://github.com/rajeshh-builds/Aura-Music")
+                  }
+                }
+              ),
+              Material3SettingsItem(
+                icon = painterResource(R.drawable.star),
                 title = { Text("MyTunes Project") },
                 description = { Text("Emerald Pulse Open-Source Edition") },
-                onClick = { }
+                onClick = { uriHandler.openUri("https://github.com/rajeshh-builds/Aura-Music") }
               )
             )
         )

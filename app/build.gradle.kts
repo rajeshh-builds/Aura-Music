@@ -37,11 +37,12 @@ android {
     applicationId = "echo.music.iad1tya"
     minSdk = 26
     targetSdk = 35
-    versionCode = 168
-    versionName = "1.5.7"
+    versionCode = 169
+    versionName = "1.5.8"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
+    resConfigs("en")
 
     // LastFM API keys from GitHub Secrets
     val lastFmKey = "266d77b5790e413ada7e41ef100d017a"
@@ -210,8 +211,6 @@ android {
   packaging {
     jniLibs {
       useLegacyPackaging = false
-      keepDebugSymbols +=
-        listOf("**/libandroidx.graphics.path.so", "**/libdatastore_shared_counter.so")
     }
     resources {
       excludes += "/META-INF/{AL2.0,LGPL2.1}"

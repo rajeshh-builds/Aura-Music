@@ -364,7 +364,12 @@ class MainActivity : ComponentActivity() {
   @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
   @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
-    installSplashScreen()
+    val splashScreen = installSplashScreen()
+    val splashStartTime = System.currentTimeMillis()
+    splashScreen.setKeepOnScreenCondition {
+      // Keep splash visible for exactly 3 seconds for brand cinematic luxury entry
+      System.currentTimeMillis() - splashStartTime < 3000L
+    }
     super.onCreate(savedInstanceState)
 
     try {

@@ -399,13 +399,14 @@ fun PlayerMenu(
               },
               text = stringResource(R.string.share),
               onClick = {
+                val shareText = "🎵 Listening to \"${mediaMetadata.title}\" by ${mediaMetadata.artists.joinToString { it.name }} on MyTunes!\nhttps://youtu.be/${mediaMetadata.id}"
                 val intent =
                   android.content.Intent().apply {
                     action = android.content.Intent.ACTION_SEND
                     type = "text/plain"
                     putExtra(
                       android.content.Intent.EXTRA_TEXT,
-                      "https://share.echomusic.fun/watch?v=${mediaMetadata.id}"
+                      shareText
                     )
                   }
                 context.startActivity(android.content.Intent.createChooser(intent, null))
@@ -812,6 +813,41 @@ fun PlayerMenu(
             )
 
             if (isQueueTrigger != true) {
+              add(
+                Material3MenuItemData(
+                  title = { Text(text = "Sleep Timer (Bujjagimpu Mode)") },
+                  description = { Text(text = "Auto pause playback with smooth audio fade-out") },
+                  icon = {
+                    Icon(
+                      painter = painterResource(R.drawable.bedtime),
+                      contentDescription = null,
+                      modifier = Modifier.size(24.dp)
+                    )
+                  },
+                  onClick = {
+                    playerConnection.service.sleepTimer.start(30)
+                    android.widget.Toast.makeText(context, "Sleep Timer set for 30 minutes 🌙", android.widget.Toast.LENGTH_SHORT).show()
+                    onDismiss()
+                  }
+                )
+              )
+              add(
+                Material3MenuItemData(
+                  title = { Text(text = "Dolby 3D Spatial Audio") },
+                  description = { Text(text = "Expand soundstage & immersion for headphones") },
+                  icon = {
+                    Icon(
+                      painter = painterResource(R.drawable.tune),
+                      contentDescription = null,
+                      modifier = Modifier.size(24.dp)
+                    )
+                  },
+                  onClick = {
+                    navController.navigate("settings/player")
+                    onDismiss()
+                  }
+                )
+              )
               add(
                 Material3MenuItemData(
                   title = { Text(text = stringResource(R.string.equalizer)) },
