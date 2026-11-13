@@ -150,7 +150,11 @@ fun RingtoneTrimmerDialog(
         RangeSlider(
           value = rangeSec,
           onValueChange = { newRangeSec ->
-            rangeSec = newRangeSec
+            val start = newRangeSec.start
+            val end = newRangeSec.endInclusive
+            // Enforce hard 30s maximum duration window
+            val clampedEnd = if (end - start > 30f) start + 30f else end
+            rangeSec = start..clampedEnd
 
             if (isPlaying) {
               exoPlayer.pause()
@@ -165,12 +169,12 @@ fun RingtoneTrimmerDialog(
 
         val selectedDurationSec = (rangeSec.endInclusive - rangeSec.start).toLong()
         Text(
-          text = "Selected duration: ${makeTimeString(selectedDurationSec * 1000)}",
+          text = "Selected duration: ${makeTimeString(selectedDurationSec * 1000)} (Max 30s)",
           style = MaterialTheme.typography.labelMedium,
           modifier = Modifier.align(Alignment.CenterHorizontally),
           color =
-            if (selectedDurationSec > 40) MaterialTheme.colorScheme.error
-            else MaterialTheme.colorScheme.onSurfaceVariant
+            if (selectedDurationSec > 30) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.primary
         )
       }
     },
@@ -178,7 +182,9 @@ fun RingtoneTrimmerDialog(
       Button(
         onClick = {
           exoPlayer.stop()
-          onConfirm((rangeSec.start * 1000).toLong(), (rangeSec.endInclusive * 1000).toLong())
+          val start = (rangeSec.start * 1000).toLong()
+          val end = minOf((rangeSec.endInclusive * 1000).toLong(), start + 30_000L)
+          onConfirm(start, end)
         },
       ) {
         Text("Set as Ringtone")

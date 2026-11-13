@@ -1203,10 +1203,10 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
         .setLoadControl(
           DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-              60_000,  // min buffer: 60s (saves mobile data from downloading full songs ahead)
+              30_000,  // min buffer: 30s (ultra-fast recovery on 2G/3G/4G unstable network)
               120_000, // max buffer: 2 minutes
-              100,     // bufferForPlaybackMs: 100ms for instant zero-latency startup
-              300      // bufferForPlaybackAfterRebufferMs: 300ms
+              50,      // bufferForPlaybackMs: 50ms for instant zero-latency startup on slow networks
+              150      // bufferForPlaybackAfterRebufferMs: 150ms instant resume after buffer dip
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
